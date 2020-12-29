@@ -30,10 +30,10 @@ struct Pos{
 
 class Enemy{
     private:
+        int size= 1;
         Pos *table= NULL;
         Pos **EnemyBurst;
     public:
-        int size= 1;
         bool check_enemy_burst();
         void add_enemy();
         //table
@@ -61,6 +61,8 @@ void algorithm_A(Board board, Player player, int index[]){
 
     Enemy enemy;
     enemy.push(1, 1);
+    enemy.push(2, 1);
+    enemy.push(3, 1);
     enemy.print_table();
     // if(check_board_empty(board))
     //     cout<<"yep, is empty!"<<endl;
@@ -92,15 +94,12 @@ bool check_board_empty(Board board){
 void Enemy::push(int i, int j){
     if(table!= NULL){
         Pos *tmp= table;
-        delete [] table;
-        Pos *table;
         table= new Pos[size++];
-        for(int i= 0; i<size-1; i++)
-            table[i]= tmp[i];
+        for(int x= 0; x<size-1; x++)
+            table[x]= tmp[x];
     }
     else
         table= new Pos[size];
-    
     table[size-1].x= i;
     table[size-1].y =j;
 }

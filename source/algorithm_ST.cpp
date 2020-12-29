@@ -30,14 +30,13 @@ struct Pos{
 
 class Enemy{
     private:
-        int size= 1;
+        Pos *EnemyBurst= NULL;
         Pos *table= NULL;
-        Pos **EnemyBurst;
+        int size= 1;
     public:
-        bool check_enemy_burst();
-        void add_enemy();
+        bool check_enemy_burst(Board);
         //table
-        void push(int i, int j);
+        void push_table(int, int);
         void print_table();
 };
 
@@ -60,14 +59,19 @@ void algorithm_A(Board board, Player player, int index[]){
     int color = player.get_color();
 
     Enemy enemy;
-    enemy.push(1, 1);
-    enemy.push(2, 1);
-    enemy.push(3, 1);
+    enemy.push_table(1, 1);
+    enemy.push_table(3, 1);
     enemy.print_table();
-    // if(check_board_empty(board))
-    //     cout<<"yep, is empty!"<<endl;
-    // else
-    //     cout<<"no, is not empty! "<<endl;
+    enemy.push_table(2, 1);
+    enemy.print_table();
+    enemy.push_table(4, 1);
+    enemy.print_table();
+
+    if(check_board_empty(board))
+        cout<<"yep, is empty!"<<endl;
+    else{
+        enemy.check_enemy_burst(board);
+    }
     
     
     // while(1){
@@ -91,26 +95,50 @@ bool check_board_empty(Board board){
 }
 
 //Enemy
-void Enemy::push(int i, int j){
+void Enemy::push_table(int i, int j){
     if(table!= NULL){
+        cout<<"push"<<endl;
         Pos *tmp= table;
-        table= new Pos[size++];
-        for(int x= 0; x<size-1; x++)
+        table= new Pos[++size];
+        cout<<"size: "<<size<<endl;
+        for(int x= 0; x<size-1; x++){
             table[x]= tmp[x];
+            cout<<"x "<<x<<endl;
+            cout<<"= "<<tmp[x].x<<tmp[x].y<<endl;
+            cout<<"t= "<<table[x].x<<table[x].y<<endl;
+        }
     }
     else
         table= new Pos[size];
     table[size-1].x= i;
     table[size-1].y =j;
+    cout<<"=== "<<table[size-1].x<<table[size-1].y<<endl;
 }
 
 void Enemy::print_table(){
     if(table!=NULL){
-        for(int i= 0; i<size; i++)
-            cout<<table[i].x<<table[i].y<<" ";
+        for(int i= 0; i<size; i++){
+            cout<<"i: "<<i<<endl;
+            cout<<table[i].x<<table[i].y<<endl;;
+        }
         cout<<endl;
     }
     else
         cout<<"empty..."<<endl;
     
+}
+
+bool Enemy::check_enemy_burst(Board board){
+    bool burst= false;
+    EnemyBurst= NULL;
+    for(int i= 0; i< ROW; i++){
+        for(int j= 0; j<COL; j++){
+            if(board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j)){
+                // push_table(i, j);
+                burst= true;
+            }
+        }
+    }
+    // print_table();
+    return burst;
 }

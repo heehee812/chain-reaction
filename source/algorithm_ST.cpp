@@ -28,48 +28,90 @@ struct Pos{
     int x, y;
 };
 
-//board
-bool board_empty(Board board);
+class Enemy{
+    private:
+        Pos *table= NULL;
+        Pos **EnemyBurst;
+    public:
+        int size= 1;
+        bool check_enemy_burst();
+        void add_enemy();
+        //table
+        void push(int i, int j);
+        void print_table();
+};
 
-//enemy
-Pos *EnemyBurst;
-bool enemy_burst();
-void add_enemy();
+//board
+bool check_board_empty(Board board);
 
 //self
 Pos *AroundPoint;
 Pos *AddPoint;
 
-bool point_around();
-bool point_add();
+bool check_point_around();
+bool check_point_add();
 void attack(); //turn the bursted one to mine
 void point_burst(); //find the most number to burst
 void priority_add();
 
 void algorithm_A(Board board, Player player, int index[]){
-    srand(time(NULL)*time(NULL));
-
-    
 
     int row, col;
     int color = player.get_color();
-    
-    while(1){
-        row = rand() % 5;
-        col = rand() % 6;
-        if(board.get_cell_color(row, col) == color || board.get_cell_color(row, col) == 'w') break;
-    }
 
-    index[0] = row;
-    index[1] = col;
+    Enemy enemy;
+    enemy.push(1, 1);
+    enemy.print_table();
+    // if(check_board_empty(board))
+    //     cout<<"yep, is empty!"<<endl;
+    // else
+    //     cout<<"no, is not empty! "<<endl;
+    
+    
+    // while(1){
+    //     row = rand() % 5;
+    //     col = rand() % 6;
+    //     if(board.get_cell_color(row, col) == color || board.get_cell_color(row, col) == 'w') break;
+    // }
+
+    // index[0] = row;
+    // index[1] = col;
     
 }
 
-bool board_empty(Board board){
+bool check_board_empty(Board board){
     for(int i= 0; i<ROW; i++)
         for(int j= 0; j<COL; j++){
             if(board.get_orbs_num(i, j)!= 0)
                 return false;
         }
     return true;
+}
+
+//Enemy
+void Enemy::push(int i, int j){
+    if(table!= NULL){
+        Pos *tmp= table;
+        delete [] table;
+        Pos *table;
+        table= new Pos[size++];
+        for(int i= 0; i<size-1; i++)
+            table[i]= tmp[i];
+    }
+    else
+        table= new Pos[size];
+    
+    table[size-1].x= i;
+    table[size-1].y =j;
+}
+
+void Enemy::print_table(){
+    if(table!=NULL){
+        for(int i= 0; i<size; i++)
+            cout<<table[i].x<<table[i].y<<" ";
+        cout<<endl;
+    }
+    else
+        cout<<"empty..."<<endl;
+    
 }

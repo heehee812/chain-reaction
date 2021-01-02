@@ -26,6 +26,7 @@ using namespace std;
 *************************************************************************/
 struct Pos{
     int x, y;
+    int val= 0;
 };
 
 class Enemy{
@@ -34,15 +35,8 @@ class Enemy{
         int EnemySize= 1;
         Pos *table= NULL;
         int TableSize= 1;
-        char color;
+        int color= BLUE;
     public:
-        Enemy(Player player){
-            if(player.get_color()== RED)
-                color= BLUE;
-            else
-                color= RED;
-            
-        }
         bool check_enemy_burst(Board);
         //table
         void push_table(int, int);
@@ -52,17 +46,18 @@ class Enemy{
         void print_enemy_burst();
         Pos enemy_burst_top();
         void enemy_burst_pop();
+        void sort_enemy_burst(Board);
 };
 
 //board
-bool check_board_empty(Board board);
+bool check_board_empty(Board);
 
 //self
 Pos *AroundPoint;
 Pos *AddPoint;
 
 bool check_point_add();
-bool protect(Pos); //turn the bursted one to mine
+bool protect(Enemy); //turn the bursted one to mine
 bool attack(); //find the harmful to burst
 void priority_add();
 bool check_point_around(int, Board);
@@ -72,12 +67,20 @@ void algorithm_A(Board board, Player player, int index[]){
 
     int row, col;
     int color = player.get_color();
-    Enemy enemy(player);
+    Enemy enemy;
+
+    //test
+    enemy.push_enemy_burst(0, 0);
+    enemy.push_enemy_burst(2, 1);
+    enemy.push_enemy_burst(1, 0);
+    enemy.sort_enemy_burst(board);
+    enemy.print_enemy_burst();
     
     // if(!check_board_empty(board)){
     //     if(enemy.check_enemy_burst(board)){
     //         cout<<"enemy burst"<<endl;
-    //         if(protect(enemy.enemy_burst_top()))
+    //         enemy.sort_enemy_burst(board, player);
+    //         if(protect(enemy))
     //             cout<<"protect, return the point"<<endl;
     //         else{
     //             cout<<"connot protect"<<endl;
@@ -120,8 +123,9 @@ bool check_board_empty(Board board){
     return true;
 }
 
-bool protect(Pos *EnemyBurst){
+bool protect(Enemy enemy){
     bool pro= true;
+    
     return !pro;
 }
 
@@ -261,7 +265,8 @@ void Enemy::push_enemy_burst(int i, int j){
 void Enemy::print_enemy_burst(){
     if(EnemyBurst!=NULL){
         for(int i= 0; i<EnemySize; i++){
-            cout<<EnemyBurst[i].x<<EnemyBurst[i].y<<" ";;
+            // cout<<EnemyBurst[i].x<<EnemyBurst[i].y<<" ";
+            cout<<EnemyBurst[i].val<<" ";
         }
         cout<<endl;
     }
@@ -269,9 +274,23 @@ void Enemy::print_enemy_burst(){
         cout<<"enemy burst empty..."<<endl;
 }
 
+void Enemy::sort_enemy_burst(Board board){
+    Board boardCopy= board;
+    Player enemy(BLUE);
+    for(int i= 0; i<EnemySize; i++){
+        int val= 0;
+        boardCopy.place_orb(EnemyBurst[i].x, EnemyBurst[i].y, &enemy);
+        for(int r= 0; r< ROW; r++)
+            for(int c= 0; c<COL; c++)
+                if(boardCopy.get_cell_color(r, c)== color)
+                    val++;
+        EnemyBurst[i].val= val;
+    }
+    
+}
+
 Pos Enemy::enemy_burst_top(){
     Pos tmp= this->EnemyBurst[EnemySize-1];
-    enemy_burst_pop();
     return tmp;
 }
 

@@ -34,7 +34,15 @@ class Enemy{
         int EnemySize= 1;
         Pos *table= NULL;
         int TableSize= 1;
+        char color;
     public:
+        Enemy(Player player){
+            if(player.get_color()== RED)
+                color= BLUE;
+            else
+                color= RED;
+            
+        }
         bool check_enemy_burst(Board);
         //table
         void push_table(int, int);
@@ -61,8 +69,7 @@ void algorithm_A(Board board, Player player, int index[]){
 
     int row, col;
     int color = player.get_color();
-
-    Enemy enemy;
+    Enemy enemy(player);
     
     if(check_board_empty(board))
         cout<<"yep, is empty!"<<endl;
@@ -123,7 +130,7 @@ bool Enemy::check_enemy_burst(Board board){
     EnemyBurst= NULL;
     for(int i= 0; i< ROW; i++){
         for(int j= 0; j<COL; j++){
-            if(board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j)){
+            if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
                 push_enemy_burst(i, j);
                 burst= true;
             }

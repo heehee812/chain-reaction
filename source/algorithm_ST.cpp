@@ -61,9 +61,7 @@ void algorithm_A(Board board, Player player, int index[]){
     Enemy enemy;
     enemy.push_table(1, 1);
     enemy.push_table(3, 1);
-    enemy.print_table();
     enemy.push_table(2, 1);
-    enemy.print_table();
     enemy.push_table(4, 1);
     enemy.print_table();
 
@@ -97,29 +95,22 @@ bool check_board_empty(Board board){
 //Enemy
 void Enemy::push_table(int i, int j){
     if(table!= NULL){
-        cout<<"push"<<endl;
         Pos *tmp= table;
         table= new Pos[++size];
-        cout<<"size: "<<size<<endl;
         for(int x= 0; x<size-1; x++){
             table[x]= tmp[x];
-            cout<<"x "<<x<<endl;
-            cout<<"= "<<tmp[x].x<<tmp[x].y<<endl;
-            cout<<"t= "<<table[x].x<<table[x].y<<endl;
         }
     }
     else
         table= new Pos[size];
     table[size-1].x= i;
     table[size-1].y =j;
-    cout<<"=== "<<table[size-1].x<<table[size-1].y<<endl;
 }
 
 void Enemy::print_table(){
     if(table!=NULL){
         for(int i= 0; i<size; i++){
-            cout<<"i: "<<i<<endl;
-            cout<<table[i].x<<table[i].y<<endl;;
+            cout<<table[i].x<<table[i].y<<" ";;
         }
         cout<<endl;
     }

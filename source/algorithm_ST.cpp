@@ -61,8 +61,8 @@ Pos *AddPoint;
 
 bool check_point_around();
 bool check_point_add();
-void attack(); //turn the bursted one to mine
-void point_burst(); //find the most number to burst
+bool protect(); //turn the bursted one to mine
+void attack(); //find the harmful to burst
 void priority_add();
 
 void algorithm_A(Board board, Player player, int index[]){
@@ -74,7 +74,15 @@ void algorithm_A(Board board, Player player, int index[]){
     if(check_board_empty(board))
         cout<<"yep, is empty!"<<endl;
     else{
-        enemy.check_enemy_burst(board);
+        if(enemy.check_enemy_burst(board)){
+            if(protect())
+                cout<<"return the point"<<endl;
+            else{
+                attack();
+            }
+        }
+        else
+            cout<<"No, no one burst..."<<endl;
     }
     
     
@@ -96,6 +104,15 @@ bool check_board_empty(Board board){
                 return false;
         }
     return true;
+}
+
+bool protect(){
+    bool atta= true;
+    return !atta;
+}
+
+void attack(){
+    cout<<"time to attack"<<endl;
 }
 
 //Enemy
@@ -136,7 +153,6 @@ bool Enemy::check_enemy_burst(Board board){
             }
         }
     }
-    print_enemy_burst();
     return burst;
 }
 

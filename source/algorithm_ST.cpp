@@ -50,6 +50,8 @@ class Enemy{
         //burst
         void push_enemy_burst(int, int);
         void print_enemy_burst();
+        Pos enemy_burst_top();
+        void enemy_burst_pop();
 };
 
 //board
@@ -60,7 +62,7 @@ Pos *AroundPoint;
 Pos *AddPoint;
 
 bool check_point_add();
-bool protect(); //turn the bursted one to mine
+bool protect(Pos); //turn the bursted one to mine
 bool attack(); //find the harmful to burst
 void priority_add();
 bool check_point_around(int, Board);
@@ -72,31 +74,31 @@ void algorithm_A(Board board, Player player, int index[]){
     int color = player.get_color();
     Enemy enemy(player);
     
-    if(!check_board_empty(board)){
-        if(enemy.check_enemy_burst(board)){
-            cout<<"enemy burst"<<endl;
-            if(protect())
-                cout<<"protect, return the point"<<endl;
-            else{
-                cout<<"connot protect"<<endl;
-                if(attack())
-                    cout<<"attack, return the point"<<endl;
-                else
-                    cout<<"cannot attack"<<endl;
-            }
-        }
-        //if no enemy burst or cannot attack and protect
-        else
-            cout<<"No, no one burst..."<<endl;
-        if(check_point_around(color, board)){
-            cout<<"point around, return the point"<<endl;
-        }
-        else
-            cout<<"no one need around"<<endl;
-    }
-    else
-        cout<<"board is empty!"<<endl;
-    priority_add();
+    // if(!check_board_empty(board)){
+    //     if(enemy.check_enemy_burst(board)){
+    //         cout<<"enemy burst"<<endl;
+    //         if(protect(enemy.enemy_burst_top()))
+    //             cout<<"protect, return the point"<<endl;
+    //         else{
+    //             cout<<"connot protect"<<endl;
+    //             if(attack())
+    //                 cout<<"attack, return the point"<<endl;
+    //             else
+    //                 cout<<"cannot attack"<<endl;
+    //         }
+    //     }
+    //     //if no enemy burst or cannot attack and protect
+    //     else
+    //         cout<<"No, no one burst..."<<endl;
+    //     if(check_point_around(color, board)){
+    //         cout<<"point around, return the point"<<endl;
+    //     }
+    //     else
+    //         cout<<"no one need around"<<endl;
+    // }
+    // else
+    //     cout<<"board is empty!"<<endl;
+    // priority_add();
        
     // while(1){
     //     row = rand() % 5;
@@ -118,7 +120,7 @@ bool check_board_empty(Board board){
     return true;
 }
 
-bool protect(){
+bool protect(Pos *EnemyBurst){
     bool pro= true;
     return !pro;
 }
@@ -231,7 +233,7 @@ void Enemy::print_table(){
 
 bool Enemy::check_enemy_burst(Board board){
     bool burst= false;
-    EnemyBurst= NULL;
+    delete [] EnemyBurst;
     for(int i= 0; i< ROW; i++){
         for(int j= 0; j<COL; j++){
             if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
@@ -265,4 +267,20 @@ void Enemy::print_enemy_burst(){
     }
     else
         cout<<"enemy burst empty..."<<endl;
+}
+
+Pos Enemy::enemy_burst_top(){
+    Pos tmp= this->EnemyBurst[EnemySize-1];
+    enemy_burst_pop();
+    return tmp;
+}
+
+void Enemy::enemy_burst_pop(){
+    EnemySize--;
+    Pos *tmp;
+    tmp= EnemyBurst;
+    delete [] EnemyBurst;
+    for(int i= 0; i< EnemySize; i++){
+        EnemyBurst[i]= tmp[i];
+    }
 }

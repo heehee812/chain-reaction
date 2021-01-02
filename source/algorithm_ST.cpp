@@ -31,13 +31,17 @@ struct Pos{
 class Enemy{
     private:
         Pos *EnemyBurst= NULL;
+        int EnemySize= 1;
         Pos *table= NULL;
-        int size= 1;
+        int TableSize= 1;
     public:
         bool check_enemy_burst(Board);
         //table
         void push_table(int, int);
         void print_table();
+        //burst
+        void push_enemy_burst(int, int);
+        void print_enemy_burst();
 };
 
 //board
@@ -59,12 +63,7 @@ void algorithm_A(Board board, Player player, int index[]){
     int color = player.get_color();
 
     Enemy enemy;
-    enemy.push_table(1, 1);
-    enemy.push_table(3, 1);
-    enemy.push_table(2, 1);
-    enemy.push_table(4, 1);
-    enemy.print_table();
-
+    
     if(check_board_empty(board))
         cout<<"yep, is empty!"<<endl;
     else{
@@ -96,26 +95,26 @@ bool check_board_empty(Board board){
 void Enemy::push_table(int i, int j){
     if(table!= NULL){
         Pos *tmp= table;
-        table= new Pos[++size];
-        for(int x= 0; x<size-1; x++){
+        table= new Pos[++TableSize];
+        for(int x= 0; x<TableSize-1; x++){
             table[x]= tmp[x];
         }
     }
     else
-        table= new Pos[size];
-    table[size-1].x= i;
-    table[size-1].y =j;
+        table= new Pos[TableSize];
+    table[TableSize-1].x= i;
+    table[TableSize-1].y =j;
 }
 
 void Enemy::print_table(){
     if(table!=NULL){
-        for(int i= 0; i<size; i++){
+        for(int i= 0; i<TableSize; i++){
             cout<<table[i].x<<table[i].y<<" ";;
         }
         cout<<endl;
     }
     else
-        cout<<"empty..."<<endl;
+        cout<<"table empty..."<<endl;
     
 }
 
@@ -125,11 +124,35 @@ bool Enemy::check_enemy_burst(Board board){
     for(int i= 0; i< ROW; i++){
         for(int j= 0; j<COL; j++){
             if(board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j)){
-                // push_table(i, j);
+                push_enemy_burst(i, j);
                 burst= true;
             }
         }
     }
-    // print_table();
+    print_enemy_burst();
     return burst;
+}
+
+void Enemy::push_enemy_burst(int i, int j){
+    if(EnemyBurst!= NULL){
+        Pos *tmp= EnemyBurst;
+        EnemyBurst= new Pos[++EnemySize];
+        for(int x= 0; x<EnemySize-1; x++){
+            EnemyBurst[x]= tmp[x];
+        }
+    }
+    else
+        EnemyBurst= new Pos[EnemySize];
+    EnemyBurst[EnemySize-1].x= i;
+    EnemyBurst[EnemySize-1].y =j;
+}
+void Enemy::print_enemy_burst(){
+    if(EnemyBurst!=NULL){
+        for(int i= 0; i<EnemySize; i++){
+            cout<<EnemyBurst[i].x<<EnemyBurst[i].y<<" ";;
+        }
+        cout<<endl;
+    }
+    else
+        cout<<"enemy burst empty..."<<endl;
 }

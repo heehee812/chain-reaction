@@ -59,11 +59,12 @@ bool check_board_empty(Board board);
 Pos *AroundPoint;
 Pos *AddPoint;
 
-bool check_point_around();
 bool check_point_add();
 bool protect(); //turn the bursted one to mine
-void attack(); //find the harmful to burst
+bool attack(); //find the harmful to burst
 void priority_add();
+bool check_point_around(int, Board);
+bool check_around(int, int, Board, int);
 
 void algorithm_A(Board board, Player player, int index[]){
 
@@ -78,11 +79,14 @@ void algorithm_A(Board board, Player player, int index[]){
             if(protect())
                 cout<<"return the point"<<endl;
             else{
-                attack();
+                if(attack())
+                    cout<<"return the point"<<endl;
             }
         }
+        //if no enemy burst or cannot attack and protect
         else
             cout<<"No, no one burst..."<<endl;
+        check_point_around(color, board);
     }
     
     
@@ -107,12 +111,83 @@ bool check_board_empty(Board board){
 }
 
 bool protect(){
-    bool atta= true;
-    return !atta;
+    bool pro= true;
+    return !pro;
 }
 
-void attack(){
-    cout<<"time to attack"<<endl;
+bool attack(){
+    bool atta= true;
+    return atta;
+}
+
+bool check_point_around(int color, Board board){
+    bool around= false;
+    for(int i= 0; i<ROW; i++)
+        for(int j= 0; j< COL; j++){
+            if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
+                around= check_around(i, j, board, color);
+            }
+        }
+    return around;
+}
+
+bool check_around(int i, int j, Board board, int color){
+    bool around= false;
+    if(i>0){
+        if(board.get_cell_color(i- 1, j)== 'w'){
+            cout<<"store"<<i- 1<<j<<"to the AddPoint queue"<<endl;
+            around= true;
+        }
+    }
+    //down
+    if(i<ROW){
+        if(board.get_cell_color(i+ 1, j)== 'w'){
+            cout<<"store"<<i+ 1<<j<<"to the AddPoint queue"<<endl;
+            around= true;
+        }
+    }
+    //left
+    if(j>0){
+        if(board.get_cell_color(i, j- 1)== 'w'){
+            cout<<"store"<<i<<j- 1<<"to the AddPoint queue"<<endl;
+            around= true;
+        }
+    }
+    //right
+    if(j<COL){
+        if(board.get_cell_color(i, j+ 1)== 'w'){
+            cout<<"store"<<i<<j+ 1<<"to the AddPoint queue"<<endl;
+            around= true;
+        }
+    }
+    //up-left
+    if(j>0&&i>0){
+        if(board.get_cell_color(i- 1, j- 1)== 'w')
+            cout<<"store"<<i- 1<<j- 1<<"to the AddPoint queue"<<endl;
+            around= true;
+    }
+    //up-right
+    if(j<COL&&i>0){
+        if(board.get_cell_color(i- 1, j+ 1)== 'w'){
+            cout<<"store"<<i- 1<<j+ 1<<"to the AddPoint queue"<<endl;
+            around= true;
+        }
+    }
+    //down-left
+    if(j>0&& i<ROW){
+        if(board.get_cell_color(i+ 1, j- 1)== 'w'){
+            cout<<"store"<<i+ 1<<j- 1<<"to the AddPoint queue"<<endl;
+            around= true;
+        }
+    }
+    //down-right
+    if(j<COL&& i<ROW){
+        if(board.get_cell_color(i+ 1, j+ 1)== 'w'){
+            cout<<"store"<<i+ 1<<j+ 1<<"to the AddPoint queue"<<endl;
+            around= true;
+        }
+    }
+    return around;
 }
 
 //Enemy

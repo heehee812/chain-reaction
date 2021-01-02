@@ -72,24 +72,32 @@ void algorithm_A(Board board, Player player, int index[]){
     int color = player.get_color();
     Enemy enemy(player);
     
-    if(check_board_empty(board))
-        cout<<"yep, is empty!"<<endl;
-    else{
+    if(!check_board_empty(board)){
         if(enemy.check_enemy_burst(board)){
+            cout<<"enemy burst"<<endl;
             if(protect())
-                cout<<"return the point"<<endl;
+                cout<<"protect, return the point"<<endl;
             else{
+                cout<<"connot protect"<<endl;
                 if(attack())
-                    cout<<"return the point"<<endl;
+                    cout<<"attack, return the point"<<endl;
+                else
+                    cout<<"cannot attack"<<endl;
             }
         }
         //if no enemy burst or cannot attack and protect
         else
             cout<<"No, no one burst..."<<endl;
-        check_point_around(color, board);
+        if(check_point_around(color, board)){
+            cout<<"point around, return the point"<<endl;
+        }
+        else
+            cout<<"no one need around"<<endl;
     }
-    
-    
+    else
+        cout<<"board is empty!"<<endl;
+    priority_add();
+       
     // while(1){
     //     row = rand() % 5;
     //     col = rand() % 6;
@@ -117,7 +125,7 @@ bool protect(){
 
 bool attack(){
     bool atta= true;
-    return atta;
+    return !atta;
 }
 
 bool check_point_around(int color, Board board){
@@ -125,7 +133,7 @@ bool check_point_around(int color, Board board){
     for(int i= 0; i<ROW; i++)
         for(int j= 0; j< COL; j++){
             if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
-                around= check_around(i, j, board, color);
+                around= check_around(i, j, board, color)&around;
             }
         }
     return around;
@@ -188,6 +196,10 @@ bool check_around(int i, int j, Board board, int color){
         }
     }
     return around;
+}
+
+void priority_add(){
+    cout<<"priority add the point"<<endl;
 }
 
 //Enemy

@@ -275,14 +275,20 @@ void print_around_point(){
 }
 
 void priority_add(Board board, int index[]){
+    delete [] AddPoint;
+    AddPoint= NULL;
     if(check_corner(board, index)){
         index[0]= AddPoint[AddPointSize- 1].x;
         index[1]= AddPoint[AddPointSize- 1].y;
-        cout<<"corner, return the point"<<endl;
+        cout<<"corner, return the point"<<AddPoint[AddPointSize- 1].x<<AddPoint[AddPointSize- 1].y<<endl;
         return;
     }
-    else if(check_edge(board))
-        cout<<"edge, return the point"<<endl;
+    else if(check_edge(board)){
+        index[0]= AddPoint[AddPointSize- 1].x;
+        index[1]= AddPoint[AddPointSize- 1].y;
+        cout<<"edge, return the point"<<AddPoint[AddPointSize- 1].x<<AddPoint[AddPointSize- 1].y<<endl;
+        return;
+    }
     else if(check_center(board))
         cout<<"center, return the point"<<endl;
     else{
@@ -357,33 +363,33 @@ bool check_corner(Board board, int index[]){
 bool check_edge(Board board){
     bool check= false;
     for(int i= 0; i< COL; i++){
-        if(board.get_cell_color(i, 0)== RED|| board.get_cell_color(i, 0)== 'w'){
-            if(board.get_orbs_num(i, 0)< board.get_capacity(i, 0)- 1){
-                cout<<"push "<<i<<", 0 into AddPoint"<<endl;
+        if(board.get_cell_color(0, i)== RED|| board.get_cell_color(0, i)== 'w'){
+            if(board.get_orbs_num(0, i)< board.get_capacity(0, i)- 1){
+                push_add_point(0, i);
                 check= true;
             }
         }
     }
     for(int i= 0; i< COL; i++){
-        if(board.get_cell_color(i, ROW- 1)== RED||board.get_cell_color(i, ROW- 1)== 'w'){
-            if(board.get_orbs_num(i, ROW-1)< board.get_capacity(i, ROW-1)- 1){
-                cout<<"push "<<i<<", 0 into AddPoint"<<endl;
+        if(board.get_cell_color(ROW- 1, i)== RED||board.get_cell_color(ROW- 1, i)== 'w'){
+            if(board.get_orbs_num(ROW- 1, i)< board.get_capacity(ROW- 1, i)- 1){
+                push_add_point(ROW- 1, i);
                 check= true;
             }
         }
     }
     for(int j= 0; j< ROW; j++){
-        if(board.get_cell_color(0, j)== RED|| board.get_cell_color(0, j)== 'w'){
-            if(board.get_orbs_num(0, j)< board.get_capacity(0, j)- 1){
-                cout<<"push "<<j<<", 0 into AddPoint"<<endl;
+        if(board.get_cell_color(j, 0)== RED|| board.get_cell_color(j, 0)== 'w'){
+            if(board.get_orbs_num(j, 0)< board.get_capacity(j, 0)- 1){
+                push_add_point(j, 0);
                 check= true;
             }
         }
     }
     for(int j= 0; j< ROW; j++){
-        if(board.get_cell_color(COL- 1, j)== RED|| board.get_cell_color(COL- 1, j)== 'w'){
-            if(board.get_orbs_num(COL- 1, j)< board.get_capacity(COL- 1, j)- 1){
-                cout<<"push "<<j<<", 0 into AddPoint"<<endl;
+        if(board.get_cell_color(j, COL- 1)== RED|| board.get_cell_color(j, COL- 1)== 'w'){
+            if(board.get_orbs_num(j, COL- 1)< board.get_capacity(j, COL- 1)- 1){
+                push_add_point(j, COL- 1);
                 check= true;
             }
         }

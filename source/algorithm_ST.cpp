@@ -72,6 +72,7 @@ Pos choose_around();
 bool check_around(int, int, Board, int);
 bool check_burst(Board);
 void push_burst(int, int);
+void print_burst();
 int count_board(Board, int);
 void push_center_point(int, int);
 void push_around_point(int, int);
@@ -85,8 +86,8 @@ void algorithm_A(Board board, Player player, int index[]){
     
     if(!check_board_empty(board)){
         if(enemy.check_enemy_burst(board)){
-            cout<<"enemy burst"<<endl;
             enemy.sort_enemy_burst(board);
+            cout<<"enemy burst."<<endl;
             if(protect(enemy, board, player, index))
                 cout<<"protect, return the point"<<index[0]<<index[1]<<endl;
             else{
@@ -133,7 +134,7 @@ bool protect(Enemy enemy, Board board, Player redPlayer, int index[]){
             for(int i= 0; i<BurstSize; i++){
                 Board boardCopy= board;
                 boardCopy.place_orb(Burst[i].x, Burst[i].y, &redPlayer);
-                if(boardCopy.get_cell_color(tmp.x, tmp.y)== RED){
+                if(boardCopy.get_cell_color(tmp.x, tmp.y)!= BLUE){
                     int newCount= count_board(boardCopy, RED);
                     if(count<newCount){
                         index[0]= Burst[i].x;
@@ -149,7 +150,6 @@ bool protect(Enemy enemy, Board board, Player redPlayer, int index[]){
             else
                 tmp= enemy.enemy_burst_top();
         }
-        Burst= NULL;
     }
     return pro;
 }
@@ -450,7 +450,8 @@ bool check_point_center(int i, int j, Board board){
 bool check_burst(Board board){
     bool burst= false;
     delete [] Burst;
-    BurstSize= 0;
+    Burst= NULL;
+    BurstSize= 1;
     for(int i= 0; i< ROW; i++){
         for(int j= 0; j<COL; j++){
             if(board.get_cell_color(i, j)== RED&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
@@ -482,6 +483,17 @@ void push_burst(int i, int j){
         Burst[0].x= i;
         Burst[0].y =j;
     }
+}
+
+void print_burst(){
+    if(Burst!=NULL){
+        for(int i= 0; i<BurstSize; i++){
+            cout<<Burst[i].x<<Burst[i].y<<" ";
+        }
+        cout<<endl;
+    }
+    else
+        cout<<"burst empty..."<<endl;
 }
 
 void push_center_point(int i, int j){

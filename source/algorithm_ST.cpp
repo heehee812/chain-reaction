@@ -60,7 +60,7 @@ int BurstSize= 1;
 
 bool check_point_add();
 bool protect(Enemy, Board, Player); //turn the bursted one to mine
-bool attack(); //find the harmful to burst
+bool attack(Board, Player); //find the harmful to burst
 void priority_add();
 bool check_point_around(int, Board);
 bool check_around(int, int, Board, int);
@@ -83,20 +83,20 @@ void algorithm_A(Board board, Player player, int index[]){
                 cout<<"protect, return the point"<<endl;
             else{
                 cout<<"connot protect"<<endl;
-                // if(attack())
-                //     cout<<"attack, return the point"<<endl;
-                // else
-                //     cout<<"cannot attack"<<endl;
+                if(attack(board, player))
+                    cout<<"attack, return the point"<<endl;
+                else
+                    cout<<"cannot attack"<<endl;
             }
         }
         //if no enemy burst or cannot attack and protect
         else
             cout<<"No, no one burst..."<<endl;
-        // if(check_point_around(color, board)){
-        //     cout<<"point around, return the point"<<endl;
-        // }
-        // else
-        //     cout<<"no one need around"<<endl;
+        if(check_point_around(color, board)){
+            cout<<"point around, return the point"<<endl;
+        }
+        else
+            cout<<"no one need around"<<endl;
     }
     // else
     //     cout<<"board is empty!"<<endl;
@@ -138,7 +138,6 @@ bool protect(Enemy enemy, Board board, Player redPlayer){
                     if(count<newCount){
                         count= newCount;
                     }
-                    cout<<count<<endl;
                 }
             }
             if(count!= 0){
@@ -148,6 +147,7 @@ bool protect(Enemy enemy, Board board, Player redPlayer){
             else
                 tmp= enemy.enemy_burst_top();
         }
+        Burst= NULL;
     }
     return pro;
 }
@@ -161,9 +161,22 @@ int count_board(Board board, int color){
     return count;
 }
 
-bool attack(){
-    bool atta= true;
-    return !atta;
+bool attack(Board board, Player redPlayer){
+    bool atta= false;
+    int count= count_board(board, BLUE);
+    if(check_burst(board)){
+        for(int i= 0; i<BurstSize; i++){
+            Board boardCopy= board;
+            boardCopy.place_orb(Burst[i].x, Burst[i].y, &redPlayer);
+            int newCount= count_board(boardCopy, BLUE);
+            if(count>newCount){
+                count= newCount;
+                cout<<count<<endl;
+                atta= true;
+            }
+        }
+    }
+    return atta;
 }
 
 bool check_point_around(int color, Board board){
@@ -171,7 +184,7 @@ bool check_point_around(int color, Board board){
     for(int i= 0; i<ROW; i++)
         for(int j= 0; j< COL; j++){
             if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
-                around= check_around(i, j, board, color)&around;
+                around= check_around(i, j, board, color)|around;
             }
         }
     return around;
@@ -186,7 +199,7 @@ bool check_around(int i, int j, Board board, int color){
         }
     }
     //down
-    if(i<ROW){
+    if(i<ROW- 1){
         if(board.get_cell_color(i+ 1, j)== 'w'){
             cout<<"store"<<i+ 1<<j<<"to the AddPoint queue"<<endl;
             around= true;
@@ -200,7 +213,7 @@ bool check_around(int i, int j, Board board, int color){
         }
     }
     //right
-    if(j<COL){
+    if(j<COL- 1){
         if(board.get_cell_color(i, j+ 1)== 'w'){
             cout<<"store"<<i<<j+ 1<<"to the AddPoint queue"<<endl;
             around= true;
@@ -213,21 +226,21 @@ bool check_around(int i, int j, Board board, int color){
             around= true;
     }
     //up-right
-    if(j<COL&&i>0){
+    if(j<COL- 1&&i>0){
         if(board.get_cell_color(i- 1, j+ 1)== 'w'){
             cout<<"store"<<i- 1<<j+ 1<<"to the AddPoint queue"<<endl;
             around= true;
         }
     }
     //down-left
-    if(j>0&& i<ROW){
+    if(j>0&& i<ROW- 1){
         if(board.get_cell_color(i+ 1, j- 1)== 'w'){
             cout<<"store"<<i+ 1<<j- 1<<"to the AddPoint queue"<<endl;
             around= true;
         }
     }
     //down-right
-    if(j<COL&& i<ROW){
+    if(j<COL- 1&& i<ROW- 1){
         if(board.get_cell_color(i+ 1, j+ 1)== 'w'){
             cout<<"store"<<i+ 1<<j+ 1<<"to the AddPoint queue"<<endl;
             around= true;
@@ -243,6 +256,7 @@ void priority_add(){
 bool check_burst(Board board){
     bool burst= false;
     delete [] Burst;
+    BurstSize= 0;
     for(int i= 0; i< ROW; i++){
         for(int j= 0; j<COL; j++){
             if(board.get_cell_color(i, j)== RED&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
@@ -263,17 +277,23 @@ bool check_burst(Board board){
 }
 
 void push_burst(int i, int j){
+    cout<<"push"<<i<<j<<endl;
     if(Burst!= NULL){
         Pos *tmp= Burst;
         Burst= new Pos[++BurstSize];
+        cout<<BurstSize<<endl;
         for(int x= 0; x<BurstSize-1; x++){
             Burst[x]= tmp[x];
+            cout<<"Burst"<<Burst[x].x<<Burst[x].y<<endl;
         }
+        Burst[BurstSize-1].x= i;
+        Burst[BurstSize-1].y =j;
     }
-    else
+    else{
         Burst= new Pos[BurstSize];
-    Burst[BurstSize-1].x= i;
-    Burst[BurstSize-1].y =j;
+        Burst[0].x= i;
+        Burst[0].y =j;
+    }
 }
 
 //Enemy
@@ -306,6 +326,7 @@ void Enemy::print_table(){
 bool Enemy::check_enemy_burst(Board board){
     bool burst= false;
     delete [] EnemyBurst;
+    EnemySize= 0;
     for(int i= 0; i< ROW; i++){
         for(int j= 0; j<COL; j++){
             if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){

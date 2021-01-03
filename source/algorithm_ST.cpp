@@ -45,7 +45,7 @@ class Enemy{
         void push_enemy_burst(int, int);
         void print_enemy_burst();
         Pos enemy_burst_top();
-        void enemy_burst_pop();
+        bool enemy_burst_pop();
         void sort_enemy_burst(Board);
 };
 
@@ -55,13 +55,18 @@ bool check_board_empty(Board);
 //self
 Pos *AroundPoint;
 Pos *AddPoint;
+Pos *Burst;
+int BurstSize= 1;
 
 bool check_point_add();
-bool protect(Enemy); //turn the bursted one to mine
+bool protect(Enemy, Board, Player); //turn the bursted one to mine
 bool attack(); //find the harmful to burst
 void priority_add();
 bool check_point_around(int, Board);
 bool check_around(int, int, Board, int);
+bool check_burst(Board);
+void push_burst(int, int);
+int count_board(Board, int);
 
 void algorithm_A(Board board, Player player, int index[]){
 
@@ -69,36 +74,30 @@ void algorithm_A(Board board, Player player, int index[]){
     int color = player.get_color();
     Enemy enemy;
 
-    //test
-    enemy.push_enemy_burst(0, 0);
-    enemy.push_enemy_burst(2, 1);
-    enemy.push_enemy_burst(1, 0);
-    enemy.sort_enemy_burst(board);
-    enemy.print_enemy_burst();
     
-    // if(!check_board_empty(board)){
-    //     if(enemy.check_enemy_burst(board)){
-    //         cout<<"enemy burst"<<endl;
-    //         enemy.sort_enemy_burst(board, player);
-    //         if(protect(enemy))
-    //             cout<<"protect, return the point"<<endl;
-    //         else{
-    //             cout<<"connot protect"<<endl;
-    //             if(attack())
-    //                 cout<<"attack, return the point"<<endl;
-    //             else
-    //                 cout<<"cannot attack"<<endl;
-    //         }
-    //     }
-    //     //if no enemy burst or cannot attack and protect
-    //     else
-    //         cout<<"No, no one burst..."<<endl;
-    //     if(check_point_around(color, board)){
-    //         cout<<"point around, return the point"<<endl;
-    //     }
-    //     else
-    //         cout<<"no one need around"<<endl;
-    // }
+    if(!check_board_empty(board)){
+        if(enemy.check_enemy_burst(board)){
+            cout<<"enemy burst"<<endl;
+            enemy.sort_enemy_burst(board);
+            if(protect(enemy, board, player))
+                cout<<"protect, return the point"<<endl;
+            else{
+                cout<<"connot protect"<<endl;
+                // if(attack())
+                //     cout<<"attack, return the point"<<endl;
+                // else
+                //     cout<<"cannot attack"<<endl;
+            }
+        }
+        //if no enemy burst or cannot attack and protect
+        else
+            cout<<"No, no one burst..."<<endl;
+        // if(check_point_around(color, board)){
+        //     cout<<"point around, return the point"<<endl;
+        // }
+        // else
+        //     cout<<"no one need around"<<endl;
+    }
     // else
     //     cout<<"board is empty!"<<endl;
     // priority_add();
@@ -123,10 +122,43 @@ bool check_board_empty(Board board){
     return true;
 }
 
-bool protect(Enemy enemy){
-    bool pro= true;
-    
-    return !pro;
+bool protect(Enemy enemy, Board board, Player redPlayer){
+    bool pro= false;
+    if(check_burst(board)){
+        Player bluePlayer(BLUE);
+        Pos tmp= enemy.enemy_burst_top();
+        int count= 0;
+        while(enemy.enemy_burst_pop()){
+            cout<<tmp.x<<tmp.y<<endl;
+            for(int i= 0; i<BurstSize; i++){
+                Board boardCopy= board;
+                boardCopy.place_orb(Burst[i].x, Burst[i].y, &redPlayer);
+                if(boardCopy.get_cell_color(tmp.x, tmp.y)== RED){
+                    int newCount= count_board(boardCopy, RED);
+                    if(count<newCount){
+                        count= newCount;
+                    }
+                    cout<<count<<endl;
+                }
+            }
+            if(count!= 0){
+                pro= true;
+                break;
+            }
+            else
+                tmp= enemy.enemy_burst_top();
+        }
+    }
+    return pro;
+}
+
+int count_board(Board board, int color){
+    int count= 0;
+    for(int i= 0; i<ROW; i++)
+        for(int j= 0; j<COL; j++)
+            if(board.get_cell_color(i, j)== color)
+                count++;
+    return count;
 }
 
 bool attack(){
@@ -206,6 +238,42 @@ bool check_around(int i, int j, Board board, int color){
 
 void priority_add(){
     cout<<"priority add the point"<<endl;
+}
+
+bool check_burst(Board board){
+    bool burst= false;
+    delete [] Burst;
+    for(int i= 0; i< ROW; i++){
+        for(int j= 0; j<COL; j++){
+            if(board.get_cell_color(i, j)== RED&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
+                push_burst(i, j);
+                burst= true;
+            }
+        }
+    }
+    if(burst){
+        cout<<"check burst."<<endl;
+        for(int i= 0; i<BurstSize; i++)
+            cout<<Burst[i].x<<Burst[i].y<<" ";
+        cout<<endl;
+    }
+    else
+        cout<<"Cannot burst..."<<endl;
+    return burst;
+}
+
+void push_burst(int i, int j){
+    if(Burst!= NULL){
+        Pos *tmp= Burst;
+        Burst= new Pos[++BurstSize];
+        for(int x= 0; x<BurstSize-1; x++){
+            Burst[x]= tmp[x];
+        }
+    }
+    else
+        Burst= new Pos[BurstSize];
+    Burst[BurstSize-1].x= i;
+    Burst[BurstSize-1].y =j;
 }
 
 //Enemy
@@ -290,16 +358,25 @@ void Enemy::sort_enemy_burst(Board board){
 }
 
 Pos Enemy::enemy_burst_top(){
-    Pos tmp= this->EnemyBurst[EnemySize-1];
-    return tmp;
+    return this->EnemyBurst[EnemySize-1];
 }
 
-void Enemy::enemy_burst_pop(){
-    EnemySize--;
-    Pos *tmp;
-    tmp= EnemyBurst;
-    delete [] EnemyBurst;
-    for(int i= 0; i< EnemySize; i++){
-        EnemyBurst[i]= tmp[i];
+bool Enemy::enemy_burst_pop(){
+    if(EnemySize- 1> 0){
+        cout<<"true"<<endl;
+        EnemySize--;
+        Pos *tmp;
+        tmp= EnemyBurst;
+        EnemyBurst= new Pos[EnemySize];
+        if(EnemySize!= 0){
+            for(int i= 0; i< EnemySize; i++)
+                EnemyBurst[i]= tmp[i];
+        }
+        return true;
+    }
+    else{
+        cout<<"false"<<endl;
+        delete [] EnemyBurst;
+        return false;
     }
 }

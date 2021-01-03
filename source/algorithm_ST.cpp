@@ -54,6 +54,7 @@ bool check_board_empty(Board);
 bool check_corner(Board);
 bool check_edge(Board);
 bool check_center(Board);
+bool check_point_center(int, int, Board);
 
 //self
 Pos **AroundPoint= NULL;
@@ -275,8 +276,8 @@ void priority_add(Board board){
     //check the center
     if(check_corner(board))
         cout<<"corner, return the point"<<endl;
-    else if(check_edge(board))
-        cout<<"edge, return the point"<<endl;
+    // else if(check_edge(board))
+    //     cout<<"edge, return the point"<<endl;
     else if(check_center(board))
         cout<<"center, return the point"<<endl;
     else{
@@ -362,8 +363,89 @@ bool check_edge(Board board){
 }
 
 bool check_center(Board board){
+    bool check= false;
     cout<<"check center"<<endl;
-    return false;
+    for(int i= 0; i<ROW; i++)
+        for(int j= 0; j<COL; j++){
+            if(board.get_cell_color(i, j)== RED){
+                check= check_point_center(i, j, board)|check;
+            }
+        }
+    return check;
+}
+
+bool check_point_center(int i, int j, Board board){
+    bool check= false;
+    if(i> 0&& i<ROW- 1&&j> 0&& j< COL- 1){
+        if(board.get_cell_color(i-1, j)== RED&& board.get_orbs_num(i-1, j)<board.get_capacity(i-1, j)- 1)//up
+            if(board.get_cell_color(i+ 1, j)== RED&& board.get_orbs_num(i+1, j)<board.get_capacity(i+1, j)- 1)//down
+                if(board.get_cell_color(i, j- 1)== RED&& board.get_orbs_num(i, j- 1)<board.get_capacity(i, j- 1)- 1)//left
+                    if(board.get_cell_color(i, j+ 1)== RED &&board.get_orbs_num(i, j+ 1)<board.get_capacity(i, j+ 1)- 1)//right
+                        if(board.get_cell_color(i- 1, j- 1)== RED&& board.get_orbs_num(i- 1, j- 1)<board.get_capacity(i- 1, j- 1)- 1)//up-left
+                            if(board.get_cell_color(i- 1, j+ 1)== RED&& board.get_orbs_num(i- 1, j+ 1)<board.get_capacity(i- 1, j+ 1)- 1)//up-right
+                                if(board.get_cell_color(i+ 1, j- 1)== RED&& board.get_orbs_num(i+1, j- 1)<board.get_capacity(i+1, j- 1)- 1)//down-left
+                                    if(board.get_cell_color(i+ 1, j+ 1)== RED&& board.get_orbs_num(i+ 1, j+ 1)<board.get_capacity(i+ 1, j+ 1)- 1)//down-right
+                                        check= true;
+    }
+    else if(i<ROW- 1&&j> 0&& j< COL- 1){
+        if(board.get_cell_color(i+ 1, j)== RED&& board.get_orbs_num(i+1, j)<board.get_capacity(i+1, j)- 1)//down
+            if(board.get_cell_color(i, j- 1)== RED&& board.get_orbs_num(i, j- 1)<board.get_capacity(i, j- 1)- 1)//left
+                if(board.get_cell_color(i, j+ 1)== RED &&board.get_orbs_num(i, j+ 1)<board.get_capacity(i, j+ 1)- 1)//right
+                    if(board.get_cell_color(i+ 1, j- 1)== RED&& board.get_orbs_num(i+1, j- 1)<board.get_capacity(i+1, j- 1)- 1)//down-left
+                        if(board.get_cell_color(i+ 1, j+ 1)== RED&& board.get_orbs_num(i+ 1, j+ 1)<board.get_capacity(i+ 1, j+ 1)- 1)//down-right
+                            check= true;
+    }
+    else if(i> 0&&j> 0&& j< COL- 1){
+        if(board.get_cell_color(i-1, j)== RED&& board.get_orbs_num(i-1, j)<board.get_capacity(i-1, j)- 1)//up
+            if(board.get_cell_color(i, j- 1)== RED&& board.get_orbs_num(i, j- 1)<board.get_capacity(i, j- 1)- 1)//left
+                if(board.get_cell_color(i, j+ 1)== RED &&board.get_orbs_num(i, j+ 1)<board.get_capacity(i, j+ 1)- 1)//right
+                    if(board.get_cell_color(i- 1, j- 1)== RED&& board.get_orbs_num(i- 1, j- 1)<board.get_capacity(i- 1, j- 1)- 1)//up-left
+                        if(board.get_cell_color(i- 1, j+ 1)== RED&& board.get_orbs_num(i- 1, j+ 1)<board.get_capacity(i- 1, j+ 1)- 1)//up-right
+                            check= true;
+    }
+    else if(i> 0&& i<ROW- 1&& j< COL- 1){
+        if(board.get_cell_color(i-1, j)== RED&& board.get_orbs_num(i-1, j)<board.get_capacity(i-1, j)- 1)//up
+            if(board.get_cell_color(i+ 1, j)== RED&& board.get_orbs_num(i+1, j)<board.get_capacity(i+1, j)- 1)//down
+                if(board.get_cell_color(i, j+ 1)== RED &&board.get_orbs_num(i, j+ 1)<board.get_capacity(i, j+ 1)- 1)//right
+                    if(board.get_cell_color(i- 1, j+ 1)== RED&& board.get_orbs_num(i- 1, j+ 1)<board.get_capacity(i- 1, j+ 1)- 1)//up-right
+                        if(board.get_cell_color(i+ 1, j+ 1)== RED&& board.get_orbs_num(i+ 1, j+ 1)<board.get_capacity(i+ 1, j+ 1)- 1)//down-right
+                            check= true;
+    }
+    else if(i> 0&& i<ROW- 1&&j> 0){
+        if(board.get_cell_color(i-1, j)== RED&& board.get_orbs_num(i-1, j)<board.get_capacity(i-1, j)- 1)//up
+            if(board.get_cell_color(i+ 1, j)== RED&& board.get_orbs_num(i+1, j)<board.get_capacity(i+1, j)- 1)//down
+                if(board.get_cell_color(i, j- 1)== RED&& board.get_orbs_num(i, j- 1)<board.get_capacity(i, j- 1)- 1)//left
+                    if(board.get_cell_color(i- 1, j- 1)== RED&& board.get_orbs_num(i- 1, j- 1)<board.get_capacity(i- 1, j- 1)- 1)//up-left
+                        if(board.get_cell_color(i+ 1, j- 1)== RED&& board.get_orbs_num(i+1, j- 1)<board.get_capacity(i+1, j- 1)- 1)//down-left
+                            check= true;
+    }
+    else if(i<ROW- 1&&j< COL- 1){
+        if(board.get_cell_color(i+ 1, j)== RED&& board.get_orbs_num(i+1, j)<board.get_capacity(i+1, j)- 1)//down
+            if(board.get_cell_color(i, j+ 1)== RED &&board.get_orbs_num(i, j+ 1)<board.get_capacity(i, j+ 1)- 1)//right
+                if(board.get_cell_color(i+ 1, j+ 1)== RED&& board.get_orbs_num(i+ 1, j+ 1)<board.get_capacity(i+ 1, j+ 1)- 1)//down-right
+                    check= true;
+    }
+    else if(i<ROW- 1&&j> 0){
+        if(board.get_cell_color(i+ 1, j)== RED&& board.get_orbs_num(i+1, j)<board.get_capacity(i+1, j)- 1)//down
+            if(board.get_cell_color(i, j- 1)== RED&& board.get_orbs_num(i, j- 1)<board.get_capacity(i, j- 1)- 1)//left
+                if(board.get_cell_color(i+ 1, j- 1)== RED&& board.get_orbs_num(i+1, j- 1)<board.get_capacity(i+1, j- 1)- 1)//down-left
+                    check= true;
+    }
+    else if(i> 0&& j< COL- 1){
+        if(board.get_cell_color(i-1, j)== RED&& board.get_orbs_num(i-1, j)<board.get_capacity(i-1, j)- 1)//up
+            if(board.get_cell_color(i, j+ 1)== RED &&board.get_orbs_num(i, j+ 1)<board.get_capacity(i, j+ 1)- 1)//right
+                if(board.get_cell_color(i- 1, j+ 1)== RED&& board.get_orbs_num(i- 1, j+ 1)<board.get_capacity(i- 1, j+ 1)- 1)//up-right
+                    check= true;
+    }
+    else if(i<ROW- 1&& j< COL- 1){
+        if(board.get_cell_color(i-1, j)== RED&& board.get_orbs_num(i-1, j)<board.get_capacity(i-1, j)- 1)//up
+            if(board.get_cell_color(i, j- 1)== RED&& board.get_orbs_num(i, j- 1)<board.get_capacity(i, j- 1)- 1)//left
+                if(board.get_cell_color(i- 1, j- 1)== RED&& board.get_orbs_num(i- 1, j- 1)<board.get_capacity(i- 1, j- 1)- 1)//up-left
+                    check= true;
+    }
+    if(check)
+        cout<<"Add "<<i<<j<<"into AddPoint"<<endl;
+    return check;
 }
 
 bool check_burst(Board board){

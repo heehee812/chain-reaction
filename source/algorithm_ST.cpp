@@ -65,7 +65,7 @@ int AroundPointSize= 1;
 
 bool check_point_add();
 bool protect(Enemy, Board, Player, int[]); //turn the bursted one to mine
-bool attack(Board, Player); //find the harmful to burst
+bool attack(Board, Player, int[]); //find the harmful to burst
 void priority_add(Board board);
 bool check_point_around(int, Board);
 Pos choose_around();
@@ -94,8 +94,10 @@ void algorithm_A(Board board, Player player, int index[]){
             }
             else{
                 cout<<"connot protect"<<endl;
-                if(attack(board, player))
-                    cout<<"attack, return the point"<<endl;
+                if(attack(board, player, index)){
+                    cout<<"attack, return the point"<<index[0]<<index[1]<<endl;
+                    return;
+                }
                 else
                     cout<<"cannot attack"<<endl;
             }
@@ -165,7 +167,7 @@ int count_board(Board board, int color){
     return count;
 }
 
-bool attack(Board board, Player redPlayer){
+bool attack(Board board, Player redPlayer, int index[]){
     bool atta= false;
     int count= count_board(board, BLUE);
     if(check_burst(board)){
@@ -176,6 +178,8 @@ bool attack(Board board, Player redPlayer){
             if(count>newCount){
                 count= newCount;
                 atta= true;
+                index[0]= Burst[i].x;
+                index[1]= Burst[i].y;
             }
         }
     }

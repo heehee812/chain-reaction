@@ -68,9 +68,9 @@ bool check_point_add();
 bool protect(Enemy, Board, Player, int[]); //turn the bursted one to mine
 bool attack(Board, Player, int[]); //find the harmful to burst
 void priority_add(Board board, int[]);
-bool check_point_around(int, Board);
+bool check_point_around(Board);
 Pos choose_around();
-bool check_around(int, int, Board, int);
+bool check_around(int, int, Board);
 bool check_burst(Board);
 void push_burst(int, int);
 void print_burst();
@@ -87,31 +87,32 @@ void algorithm_A(Board board, Player player, int index[]){
     int color = player.get_color();
     Enemy enemy;
     
-    // if(!check_board_empty(board)){
-    //     if(enemy.check_enemy_burst(board)){
-    //         enemy.sort_enemy_burst(board);
-    //         cout<<"enemy burst."<<endl;
-    //         if(protect(enemy, board, player, index)){
-    //             cout<<"protect, return the point"<<index[0]<<index[1]<<endl;
-    //             return;
-    //         }
-    //         else{
-    //             cout<<"connot protect"<<endl;
-    //             if(attack(board, player, index)){
-    //                 cout<<"attack, return the point"<<index[0]<<index[1]<<endl;
-    //                 return;
-    //             }
-    //         }
-    //     }
-    //     //if no enemy burst or cannot attack and protect
-    //     if(check_point_around(color, board)){
-    //         Pos choosen= choose_around();
-    //         index[0]= choosen.x;
-    //         index[1]= choosen.y;
-    //         cout<<"point around, return the point"<<endl;
-    //         return;
-    //     }
-    // }
+    if(!check_board_empty(board)){
+        if(enemy.check_enemy_burst(board)){
+            enemy.sort_enemy_burst(board);
+            cout<<"enemy burst."<<endl;
+            if(protect(enemy, board, player, index)){
+                cout<<"protect, return the point"<<index[0]<<index[1]<<endl;
+                return;
+            }
+            else{
+                cout<<"connot protect"<<endl;
+                if(attack(board, player, index)){
+                    cout<<"attack, return the point"<<index[0]<<index[1]<<endl;
+                    return;
+                }
+            }
+        }
+        //if no enemy burst or cannot attack and protect
+        if(check_point_around(board)){
+            Pos choosen= choose_around();
+            cout<<"choosen: "<<choosen.x<<choosen.y<<endl;
+            index[0]= choosen.x;
+            index[1]= choosen.y;
+            cout<<"point around, return the point"<<endl;
+            return;
+        }
+    }
     priority_add(board, index);
 }
 
@@ -182,19 +183,21 @@ bool attack(Board board, Player redPlayer, int index[]){
     return atta;
 }
 
-bool check_point_around(int color, Board board){
+bool check_point_around(Board board){
+    AroundPoint= NULL;
+    AroundPointSize= 1;
     bool around= false;
     for(int i= 0; i<ROW; i++)
         for(int j= 0; j< COL; j++){
-            if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
+            if(board.get_cell_color(i, j)== RED&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
                 push_center_point(i, j);
-                around= check_around(i, j, board, color)|around;
+                around= check_around(i, j, board)|around;
             }
         }
     return around;
 }
 
-bool check_around(int i, int j, Board board, int color){
+bool check_around(int i, int j, Board board){
     bool around= false;
     if(i>0){
         if(board.get_cell_color(i- 1, j)== 'w'){
@@ -277,33 +280,35 @@ void print_around_point(){
 void priority_add(Board board, int index[]){
     delete [] AddPoint;
     AddPoint= NULL;
+    AddPointSize= 1;
     if(check_corner(board, index)){
         index[0]= AddPoint[AddPointSize- 1].x;
         index[1]= AddPoint[AddPointSize- 1].y;
         cout<<"corner, return the point"<<AddPoint[AddPointSize- 1].x<<AddPoint[AddPointSize- 1].y<<endl;
         return;
     }
-    else if(check_edge(board)){
+    if(check_edge(board)){
         index[0]= AddPoint[AddPointSize- 1].x;
         index[1]= AddPoint[AddPointSize- 1].y;
         cout<<"edge, return the point"<<AddPoint[AddPointSize- 1].x<<AddPoint[AddPointSize- 1].y<<endl;
         return;
     }
-    else if(check_center(board))
+    if(check_center(board)){
+        index[0]= AddPoint[AddPointSize- 1].x;
+        index[1]= AddPoint[AddPointSize- 1].y;
         cout<<"center, return the point"<<endl;
-    else{
-        cout<<"random"<<endl;
-        // random
-        // while(1){
-        //     row = rand() % 5;
-        //     col = rand() % 6;
-        //     if(board.get_cell_color(row, col) == color || board.get_cell_color(row, col) == 'w') break;
-        // }
-
-        // index[0] = row;
-        // index[1] = col;
+        return;
     }
-    cout<<"priority add the point"<<endl;
+    cout<<"random"<<endl;
+    int row, col;
+    while(1){
+        row = rand() % 5;
+        col = rand() % 6;
+        if(board.get_cell_color(row, col) == RED || board.get_cell_color(row, col) == 'w') break;
+    }
+    index[0] = row;
+    index[1] = col;
+    return;
 }
 
 void push_add_point(int i, int j){
@@ -330,8 +335,12 @@ void print_add_point(){
 }
 
 bool check_corner(Board board, int index[]){
+    delete [] AddPoint;
+    AddPoint= NULL;
+    AddPointSize= 1;
     bool check= false;
     if(board.get_cell_color(0, 0)== RED|| board.get_cell_color(0, 0)== 'w'){
+        cout<<"color: "<<board.get_cell_color(0, 0)<<endl;
         if(board.get_orbs_num(0, 0)< board.get_capacity(0, 0)- 1){
             push_add_point(0, 0);
             check= true;
@@ -362,7 +371,10 @@ bool check_corner(Board board, int index[]){
 
 bool check_edge(Board board){
     bool check= false;
-    for(int i= 0; i< COL; i++){
+    delete [] AddPoint;
+    AddPoint= NULL;
+    AddPointSize= 1;
+    for(int i= 1; i< COL-1; i++){
         if(board.get_cell_color(0, i)== RED|| board.get_cell_color(0, i)== 'w'){
             if(board.get_orbs_num(0, i)< board.get_capacity(0, i)- 1){
                 push_add_point(0, i);
@@ -370,7 +382,7 @@ bool check_edge(Board board){
             }
         }
     }
-    for(int i= 0; i< COL; i++){
+    for(int i= 1; i< COL-1; i++){
         if(board.get_cell_color(ROW- 1, i)== RED||board.get_cell_color(ROW- 1, i)== 'w'){
             if(board.get_orbs_num(ROW- 1, i)< board.get_capacity(ROW- 1, i)- 1){
                 push_add_point(ROW- 1, i);
@@ -378,7 +390,7 @@ bool check_edge(Board board){
             }
         }
     }
-    for(int j= 0; j< ROW; j++){
+    for(int j= 1; j< ROW-1; j++){
         if(board.get_cell_color(j, 0)== RED|| board.get_cell_color(j, 0)== 'w'){
             if(board.get_orbs_num(j, 0)< board.get_capacity(j, 0)- 1){
                 push_add_point(j, 0);
@@ -386,7 +398,7 @@ bool check_edge(Board board){
             }
         }
     }
-    for(int j= 0; j< ROW; j++){
+    for(int j= 1; j< ROW-1; j++){
         if(board.get_cell_color(j, COL- 1)== RED|| board.get_cell_color(j, COL- 1)== 'w'){
             if(board.get_orbs_num(j, COL- 1)< board.get_capacity(j, COL- 1)- 1){
                 push_add_point(j, COL- 1);
@@ -399,6 +411,9 @@ bool check_edge(Board board){
 
 bool check_center(Board board){
     bool check= false;
+    delete [] AddPoint;
+    AddPoint= NULL;
+    AddPointSize= 1;
     cout<<"check center"<<endl;
     for(int i= 0; i<ROW; i++)
         for(int j= 0; j<COL; j++){
@@ -479,7 +494,7 @@ bool check_point_center(int i, int j, Board board){
                     check= true;
     }
     if(check)
-        cout<<"Add "<<i<<j<<"into AddPoint"<<endl;
+        push_add_point(i, j);
     return check;
 }
 

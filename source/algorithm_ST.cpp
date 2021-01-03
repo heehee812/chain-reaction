@@ -88,8 +88,10 @@ void algorithm_A(Board board, Player player, int index[]){
         if(enemy.check_enemy_burst(board)){
             enemy.sort_enemy_burst(board);
             cout<<"enemy burst."<<endl;
-            if(protect(enemy, board, player, index))
+            if(protect(enemy, board, player, index)){
                 cout<<"protect, return the point"<<index[0]<<index[1]<<endl;
+                return;
+            }
             else{
                 cout<<"connot protect"<<endl;
                 if(attack(board, player))

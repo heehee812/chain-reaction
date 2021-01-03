@@ -51,6 +51,9 @@ class Enemy{
 
 //board
 bool check_board_empty(Board);
+bool check_corner(Board);
+bool check_edge(Board);
+bool check_center(Board);
 
 //self
 Pos **AroundPoint= NULL;
@@ -62,7 +65,7 @@ int AroundPointSize= 1;
 bool check_point_add();
 bool protect(Enemy, Board, Player); //turn the bursted one to mine
 bool attack(Board, Player); //find the harmful to burst
-void priority_add();
+void priority_add(Board board);
 bool check_point_around(int, Board);
 Pos choose_around();
 bool check_around(int, int, Board, int);
@@ -106,16 +109,7 @@ void algorithm_A(Board board, Player player, int index[]){
     }
     else
         cout<<"board is empty!"<<endl;
-    priority_add();
-       
-    // while(1){
-    //     row = rand() % 5;
-    //     col = rand() % 6;
-    //     if(board.get_cell_color(row, col) == color || board.get_cell_color(row, col) == 'w') break;
-    // }
-
-    // index[0] = row;
-    // index[1] = col;
+    priority_add(board);
     
 }
 
@@ -275,9 +269,101 @@ void print_around_point(){
     }
 }
 
-void priority_add(){
-    //
+void priority_add(Board board){
+    //check the corner
+    //check the edge 
+    //check the center
+    if(check_corner(board))
+        cout<<"corner, return the point"<<endl;
+    else if(check_edge(board))
+        cout<<"edge, return the point"<<endl;
+    else if(check_center(board))
+        cout<<"center, return the point"<<endl;
+    else{
+        cout<<"random"<<endl;
+        // random
+        // while(1){
+        //     row = rand() % 5;
+        //     col = rand() % 6;
+        //     if(board.get_cell_color(row, col) == color || board.get_cell_color(row, col) == 'w') break;
+        // }
+
+        // index[0] = row;
+        // index[1] = col;
+    }
     cout<<"priority add the point"<<endl;
+}
+
+
+bool check_corner(Board board){
+    bool check= false;
+    if(board.get_cell_color(0, 0)== RED|| board.get_cell_color(0, 0)== 'w'){
+        if(board.get_orbs_num(0, 0)< board.get_capacity(0, 0)- 1){
+            cout<<"push 0, 0 into AddPoint"<<endl;
+            check= true;
+        }
+    }
+    if(board.get_cell_color(0, 5)== RED||board.get_cell_color(0, 5)== 'w'){
+        if(board.get_orbs_num(0, 5)<board.get_capacity(0, 5)- 1){
+            cout<<"push 0, 5 into AddPoint"<<endl;
+            check= true;
+        }
+    }
+    if(board.get_cell_color(4, 0)== RED|| board.get_cell_color(4, 0)== 'w'){
+        if(board.get_orbs_num(4, 0)<board.get_capacity(4, 0)- 1){
+            cout<<"push 4, 0 into AddPoint"<<endl;
+            check= true;
+        }
+    }
+    if(board.get_cell_color(4, 5)== RED|| board.get_cell_color(4, 5)== 'w'){
+        if(board.get_orbs_num(4, 5)<board.get_capacity(4, 5)- 1){
+            cout<<"push 4, 5 into AddPoint"<<endl;
+            check= true;
+        }
+    }
+    return check;
+}
+
+bool check_edge(Board board){
+    bool check= false;
+    for(int i= 0; i< COL; i++){
+        if(board.get_cell_color(i, 0)== RED|| board.get_cell_color(i, 0)== 'w'){
+            if(board.get_orbs_num(i, 0)< board.get_capacity(i, 0)- 1){
+                cout<<"push "<<i<<", 0 into AddPoint"<<endl;
+                check= true;
+            }
+        }
+    }
+    for(int i= 0; i< COL; i++){
+        if(board.get_cell_color(i, ROW- 1)== RED||board.get_cell_color(i, ROW- 1)== 'w'){
+            if(board.get_orbs_num(i, ROW-1)< board.get_capacity(i, ROW-1)- 1){
+                cout<<"push "<<i<<", 0 into AddPoint"<<endl;
+                check= true;
+            }
+        }
+    }
+    for(int j= 0; j< ROW; j++){
+        if(board.get_cell_color(0, j)== RED|| board.get_cell_color(0, j)== 'w'){
+            if(board.get_orbs_num(0, j)< board.get_capacity(0, j)- 1){
+                cout<<"push "<<j<<", 0 into AddPoint"<<endl;
+                check= true;
+            }
+        }
+    }
+    for(int j= 0; j< ROW; j++){
+        if(board.get_cell_color(COL- 1, j)== RED|| board.get_cell_color(COL- 1, j)== 'w'){
+            if(board.get_orbs_num(COL- 1, j)< board.get_capacity(COL- 1, j)- 1){
+                cout<<"push "<<j<<", 0 into AddPoint"<<endl;
+                check= true;
+            }
+        }
+    }
+    return check;
+}
+
+bool check_center(Board board){
+    cout<<"check center"<<endl;
+    return false;
 }
 
 bool check_burst(Board board){

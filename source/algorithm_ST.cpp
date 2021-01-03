@@ -87,32 +87,32 @@ void algorithm_A(Board board, Player player, int index[]){
     int color = player.get_color();
     Enemy enemy;
     
-    if(!check_board_empty(board)){
-        if(enemy.check_enemy_burst(board)){
-            enemy.sort_enemy_burst(board);
-            cout<<"enemy burst."<<endl;
-            if(protect(enemy, board, player, index)){
-                cout<<"protect, return the point"<<index[0]<<index[1]<<endl;
-                return;
-            }
-            else{
-                cout<<"connot protect"<<endl;
-                if(attack(board, player, index)){
-                    cout<<"attack, return the point"<<index[0]<<index[1]<<endl;
-                    return;
-                }
-            }
-        }
-        //if no enemy burst or cannot attack and protect
-        if(check_point_around(color, board)){
-            Pos choosen= choose_around();
-            index[0]= choosen.x;
-            index[1]= choosen.y;
-            cout<<"point around, return the point"<<endl;
-            return;
-        }
-    }
-    priority_add(board, index);  
+    // if(!check_board_empty(board)){
+    //     if(enemy.check_enemy_burst(board)){
+    //         enemy.sort_enemy_burst(board);
+    //         cout<<"enemy burst."<<endl;
+    //         if(protect(enemy, board, player, index)){
+    //             cout<<"protect, return the point"<<index[0]<<index[1]<<endl;
+    //             return;
+    //         }
+    //         else{
+    //             cout<<"connot protect"<<endl;
+    //             if(attack(board, player, index)){
+    //                 cout<<"attack, return the point"<<index[0]<<index[1]<<endl;
+    //                 return;
+    //             }
+    //         }
+    //     }
+    //     //if no enemy burst or cannot attack and protect
+    //     if(check_point_around(color, board)){
+    //         Pos choosen= choose_around();
+    //         index[0]= choosen.x;
+    //         index[1]= choosen.y;
+    //         cout<<"point around, return the point"<<endl;
+    //         return;
+    //     }
+    // }
+    priority_add(board, index);
 }
 
 bool check_board_empty(Board board){
@@ -275,8 +275,12 @@ void print_around_point(){
 }
 
 void priority_add(Board board, int index[]){
-    if(check_corner(board, index))
+    if(check_corner(board, index)){
+        index[0]= AddPoint[AddPointSize- 1].x;
+        index[1]= AddPoint[AddPointSize- 1].y;
         cout<<"corner, return the point"<<endl;
+        return;
+    }
     else if(check_edge(board))
         cout<<"edge, return the point"<<endl;
     else if(check_center(board))
@@ -345,8 +349,8 @@ bool check_corner(Board board, int index[]){
             check= true;
         }
     }
-    cout<<"add point: ";
-    print_add_point();
+    if(AddPoint!= NULL)
+        print_add_point();
     return check;
 }
 

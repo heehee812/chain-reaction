@@ -64,7 +64,7 @@ int BurstSize= 1;
 int AroundPointSize= 1;
 
 bool check_point_add();
-bool protect(Enemy, Board, Player); //turn the bursted one to mine
+bool protect(Enemy, Board, Player, int[]); //turn the bursted one to mine
 bool attack(Board, Player); //find the harmful to burst
 void priority_add(Board board);
 bool check_point_around(int, Board);
@@ -87,8 +87,8 @@ void algorithm_A(Board board, Player player, int index[]){
         if(enemy.check_enemy_burst(board)){
             cout<<"enemy burst"<<endl;
             enemy.sort_enemy_burst(board);
-            if(protect(enemy, board, player))
-                cout<<"protect, return the point"<<endl;
+            if(protect(enemy, board, player, index))
+                cout<<"protect, return the point"<<index[0]<<index[1]<<endl;
             else{
                 cout<<"connot protect"<<endl;
                 if(attack(board, player))
@@ -110,7 +110,7 @@ void algorithm_A(Board board, Player player, int index[]){
     }
     else
         cout<<"board is empty!"<<endl;
-    priority_add(board);
+    // priority_add(board);
     
 }
 
@@ -123,7 +123,7 @@ bool check_board_empty(Board board){
     return true;
 }
 
-bool protect(Enemy enemy, Board board, Player redPlayer){
+bool protect(Enemy enemy, Board board, Player redPlayer, int index[]){
     bool pro= false;
     if(check_burst(board)){
         Player bluePlayer(BLUE);
@@ -136,6 +136,8 @@ bool protect(Enemy enemy, Board board, Player redPlayer){
                 if(boardCopy.get_cell_color(tmp.x, tmp.y)== RED){
                     int newCount= count_board(boardCopy, RED);
                     if(count<newCount){
+                        index[0]= Burst[i].x;
+                        index[1]= Burst[i].y;
                         count= newCount;
                     }
                 }
@@ -271,13 +273,10 @@ void print_around_point(){
 }
 
 void priority_add(Board board){
-    //check the corner
-    //check the edge 
-    //check the center
     if(check_corner(board))
         cout<<"corner, return the point"<<endl;
-    // else if(check_edge(board))
-    //     cout<<"edge, return the point"<<endl;
+    else if(check_edge(board))
+        cout<<"edge, return the point"<<endl;
     else if(check_center(board))
         cout<<"center, return the point"<<endl;
     else{
@@ -550,7 +549,8 @@ void Enemy::print_table(){
 bool Enemy::check_enemy_burst(Board board){
     bool burst= false;
     delete [] EnemyBurst;
-    EnemySize= 0;
+    EnemyBurst= NULL;
+    EnemySize= 1;
     for(int i= 0; i< ROW; i++){
         for(int j= 0; j<COL; j++){
             if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){

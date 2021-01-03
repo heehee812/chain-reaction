@@ -362,7 +362,7 @@ Pos Enemy::enemy_burst_top(){
 }
 
 bool Enemy::enemy_burst_pop(){
-    if(EnemySize- 1> 0){
+    if(EnemySize- 1>= 0){
         cout<<"true"<<endl;
         EnemySize--;
         Pos *tmp;

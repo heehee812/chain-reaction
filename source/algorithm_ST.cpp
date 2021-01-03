@@ -53,10 +53,11 @@ class Enemy{
 bool check_board_empty(Board);
 
 //self
-Pos *AroundPoint;
-Pos *AddPoint;
-Pos *Burst;
+Pos **AroundPoint= NULL;
+Pos *AddPoint= NULL;
+Pos *Burst= NULL;
 int BurstSize= 1;
+int AroundPointSize= 1;
 
 bool check_point_add();
 bool protect(Enemy, Board, Player); //turn the bursted one to mine
@@ -67,6 +68,8 @@ bool check_around(int, int, Board, int);
 bool check_burst(Board);
 void push_burst(int, int);
 int count_board(Board, int);
+void push_center_point(int, int);
+void push_around_point(int, int, int);
 
 void algorithm_A(Board board, Player player, int index[]){
 
@@ -98,9 +101,9 @@ void algorithm_A(Board board, Player player, int index[]){
         else
             cout<<"no one need around"<<endl;
     }
-    // else
-    //     cout<<"board is empty!"<<endl;
-    // priority_add();
+    else
+        cout<<"board is empty!"<<endl;
+    priority_add();
        
     // while(1){
     //     row = rand() % 5;
@@ -184,6 +187,7 @@ bool check_point_around(int color, Board board){
     for(int i= 0; i<ROW; i++)
         for(int j= 0; j< COL; j++){
             if(board.get_cell_color(i, j)== color&& (board.get_orbs_num(i, j)+ 1== board.get_capacity(i, j))){
+                push_center_point(i, j);
                 around= check_around(i, j, board, color)|around;
             }
         }
@@ -192,57 +196,66 @@ bool check_point_around(int color, Board board){
 
 bool check_around(int i, int j, Board board, int color){
     bool around= false;
+    int num= 0;
     if(i>0){
         if(board.get_cell_color(i- 1, j)== 'w'){
-            cout<<"store"<<i- 1<<j<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i- 1, j, num);
             around= true;
         }
     }
     //down
     if(i<ROW- 1){
         if(board.get_cell_color(i+ 1, j)== 'w'){
-            cout<<"store"<<i+ 1<<j<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i+ 1, j, num);
             around= true;
         }
     }
     //left
     if(j>0){
         if(board.get_cell_color(i, j- 1)== 'w'){
-            cout<<"store"<<i<<j- 1<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i, j- 1, num);
             around= true;
         }
     }
     //right
     if(j<COL- 1){
         if(board.get_cell_color(i, j+ 1)== 'w'){
-            cout<<"store"<<i<<j+ 1<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i, j+ 1, num);
             around= true;
         }
     }
     //up-left
     if(j>0&&i>0){
         if(board.get_cell_color(i- 1, j- 1)== 'w')
-            cout<<"store"<<i- 1<<j- 1<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i- 1, j- 1, num);
             around= true;
     }
     //up-right
     if(j<COL- 1&&i>0){
         if(board.get_cell_color(i- 1, j+ 1)== 'w'){
-            cout<<"store"<<i- 1<<j+ 1<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i- 1, j+ 1, num);
             around= true;
         }
     }
     //down-left
     if(j>0&& i<ROW- 1){
         if(board.get_cell_color(i+ 1, j- 1)== 'w'){
-            cout<<"store"<<i+ 1<<j- 1<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i+ 1, j- 1, num);
             around= true;
         }
     }
     //down-right
     if(j<COL- 1&& i<ROW- 1){
         if(board.get_cell_color(i+ 1, j+ 1)== 'w'){
-            cout<<"store"<<i+ 1<<j+ 1<<"to the AddPoint queue"<<endl;
+            ++num;
+            push_around_point(i+ 1, j+ 1, num);
             around= true;
         }
     }
@@ -250,6 +263,7 @@ bool check_around(int i, int j, Board board, int color){
 }
 
 void priority_add(){
+    //
     cout<<"priority add the point"<<endl;
 }
 
@@ -294,6 +308,43 @@ void push_burst(int i, int j){
         Burst[0].x= i;
         Burst[0].y =j;
     }
+}
+
+void push_center_point(int i, int j){
+    cout<<"push center"<<i<<j<<endl;
+    if(AroundPoint!= NULL){
+        Pos **tmp= AroundPoint;
+        AroundPoint= new Pos*[++AroundPointSize];
+        cout<<AroundPointSize<<endl;
+        for(int x= 0; x<AroundPointSize-1; x++){
+            AroundPoint[x]= tmp[x];
+            cout<<"centerPoint"<<AroundPoint[x][0].x<<AroundPoint[x][0].y<<endl;
+        }
+    }
+    else{
+        AroundPoint= new Pos*[AroundPointSize];
+    }
+    AroundPoint[AroundPointSize-1]= new Pos[1];
+    AroundPoint[AroundPointSize-1][0].x= i;
+    AroundPoint[AroundPointSize-1][0].y =j;
+}
+
+void push_around_point(int i, int j, int index){
+    cout<<"push around"<<i<<j<<endl;
+    Pos *tmp= AroundPoint[AroundPointSize];
+    AroundPoint[AroundPointSize]= new Pos[index];
+    cout<<index<<endl;
+    for(int x= 0; x<index-1; x++){
+        AroundPoint[AroundPointSize][x]= tmp[x];
+        cout<<"AroundPoint"<<AroundPoint[AroundPointSize][x].x<<AroundPoint[AroundPointSize][x].y<<endl;
+    }
+    AroundPoint[AroundPointSize][index- 1].x= i;
+    AroundPoint[AroundPointSize][index- 1].y =j;
+}
+
+bool check_point_add(){
+    bool add= false;
+    return add;
 }
 
 //Enemy

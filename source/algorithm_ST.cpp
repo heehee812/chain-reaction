@@ -98,17 +98,15 @@ void algorithm_A(Board board, Player player, int index[]){
                     cout<<"attack, return the point"<<index[0]<<index[1]<<endl;
                     return;
                 }
-                else
-                    cout<<"cannot attack"<<endl;
             }
         }
         //if no enemy burst or cannot attack and protect
-        else
-            cout<<"No, no one burst..."<<endl;
         if(check_point_around(color, board)){
             Pos choosen= choose_around();
-            cout<<"choosen: "<<choosen.x<<choosen.y<<endl;
+            index[0]= choosen.x;
+            index[1]= choosen.y;
             cout<<"point around, return the point"<<endl;
+            return;
         }
         else
             cout<<"no one need around"<<endl;
@@ -503,7 +501,6 @@ void print_burst(){
 }
 
 void push_center_point(int i, int j){
-    cout<<"push center"<<i<<j<<endl;
     if(AroundPoint!= NULL){
         Pos **tmp= AroundPoint;
         AroundPoint= new Pos*[++AroundPointSize];

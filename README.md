@@ -3,6 +3,7 @@ The goal of this project is to create a algorithm which have a maximum ratio to 
 
 ### Game description
 for the game rule, plz attach to [**here**](https://www.youtube.com/watch?v=7YGgI02LOtw).
+
 ![](https://i.imgur.com/op1l6zh.png)
 
 ### Algorithm
